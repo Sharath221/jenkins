@@ -1,5 +1,5 @@
 Jenkins install
-----------------------------------------------
+------------------------------------------------
 
 # add PPA repo
 sudo add-apt-repository ppa:openjdk-r/ppa
