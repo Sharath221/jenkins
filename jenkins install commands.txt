@@ -29,3 +29,9 @@ sudo systemctl enable jenkins.service
 #Re-directing Port
 sudo iptables -A PREROUTING -t nat -i eth0 -p tcp --dport 80 -j REDIRECT --to-port 8080
 sudo sh -c "iptables-save > /etc/iptables.rules"
+
+
+
+To configure jenkins to webhooks 
+place the url of jenkins server      http://example.com/github-webhook/  
+and save it
