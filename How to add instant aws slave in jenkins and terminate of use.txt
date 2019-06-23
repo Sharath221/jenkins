@@ -1,0 +1,37 @@
+How to add instant slave in jenkins
+-------------------------------------
+
+# Required AWS IAM Role of EC2 full access
+# Required AMI to start instance
+# Required Security group ID
+# Required Subnet ID
+# Required avaliablity zone
+
+
+
+Goto master jenkins
+
+Step 1 :Create creditials and Add AWS IAM user.
+
+Step 2 : 
+
+1 ) Manage jenkins
+2 ) Configure system
+3 ) Move total down and choose Cloud >> AWS
+4 ) Name it
+5 ) Select the credentials
+6 ) full the availabitiy zone Name
+7 ) Enter Private key from pem file
+8 ) Hit Advance >> choose Instance cap 1 for one instance to lanch
+9 ) Choose AMI and fill AMI ID
+10 ) Choose Type of instance need to lanch
+11 ) Avalaiblity Zone
+12 ) Fuil Security Group names with ID
+13 ) Remote FS root as /home/ubuntu
+14 ) Remote User ubuntu
+15 ) Root command prefix sudo
+16 ) Labels <Name of label "AWS"> important !
+17 ) Idel termination time 5
+18 ) Hit advance >> Number of exeutors 1
+19 ) Subnet IDS 
+20 ) Tags
