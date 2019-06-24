@@ -1,5 +1,5 @@
 Method to add slave in jenkins
-----------------------------------------
+------------------------------------------
 
 # get instance with password authunticated 
   and install/ check for java init
