@@ -1,0 +1,511 @@
+{
+	"AWSTemplateFormatVersion": "2019-09-09",
+	"Description": "Create VPC 1 publicSubnets 2 private subnets LoadBalancer  ",
+	"Metadata": {
+		"AWS::CloudFormation::Interface": {
+			"ParameterGroups": [{
+				"Label": {
+					"default": "VPC configuration parameters"
+				},
+				"Parameters": ["VPCCIDR",
+				"PublicSubnetCIDR",
+				"SSHLocation"]
+			}],
+			"ParameterLabels": {
+				"VPCCIDR": {
+					"default": "Enter CIDR of new VPC"
+				},
+				"PublicSubnetCIDR": {
+					"default": "Enter CIDR of the public subnet"
+				},
+				"SSHLocation": {
+					"default": "Subnet allowed to ssh on TCP to public subnet"
+				}
+			}
+		}
+	},
+	"Parameters": {
+		"VPCCIDR": {
+			"AllowedPattern": "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$",
+			"ConstraintDescription": "CIDR block parameter must be in the form x.x.x.x/16-28",
+			"Default": "10.1.0.0/16",
+			"Description": "CIDR block for entire VPC.",
+			"Type": "String"
+		},
+		"AZ": {
+			"Type":"String",
+			"Default":"us-east-1a"
+		},
+		"AZ2":{
+			"Type":"String",
+			"Default":"us-east-1b"
+		},
+		"PublicSubnetCIDR": {
+			"AllowedPattern": "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$",
+			"ConstraintDescription": "CIDR block parameter must be in the form x.x.x.x/16-28",
+			"Default": "10.10.1.0/24",
+			"Description": "CIDR block for the public subnet",
+			"Type": "String"
+		},
+		"PrivateSubnetCIDR": {
+			"AllowedPattern": "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$",
+			"ConstraintDescription": "CIDR block parameter must be in the form x.x.x.x/16-28",
+			"Default": "10.10.10.0/24",
+			"Description": "CIDR block for the public subnet",
+			"Type": "String"
+		},
+		"PrivateSubnetCIDR2": {
+			"AllowedPattern": "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$",
+			"ConstraintDescription": "CIDR block parameter must be in the form x.x.x.x/16-28",
+			"Default": "10.10.20.0/24",
+			"Description": "CIDR block for the public subnet",
+			"Type": "String"
+		},
+		"SSHLocation": {
+			"AllowedPattern": "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))$",
+			"ConstraintDescription": "CIDR block parameter must be in the form x.x.x.x/0-28",
+			"Default": "0.0.0.0/0",
+			"Description": "Network allowed to ssh to instances in public subnet.",
+			"Type": "String"
+		}
+	},
+	"Mappings": {
+		
+	},
+	"Resources": {
+		"VPC": {
+			"Type": "AWS::EC2::VPC",
+			"Properties": {
+				"EnableDnsSupport": "true",
+				"EnableDnsHostnames": "true",
+				"CidrBlock": {
+					"Ref": "VPCCIDR"
+				},
+				"Tags": [{
+					"Key": "Name",
+					"Value": "TEST-VPC"
+				},
+				{
+					"Key": "CloudFormationStack",
+					"Value": {
+						"Ref": "AWS::StackId"
+					}
+				}]
+			}
+		},
+		"InternetGateway": {
+			"Type": "AWS::EC2::InternetGateway",
+			"Properties": {
+				"Tags": [{
+					"Key": "Name",
+					"Value": "TEST-VPC-IGW"
+				},
+				{
+					"Key": "CloudFormationStack",
+					"Value": {
+						"Ref": "AWS::StackId"
+					}
+				}]
+			}
+		},
+		"PublicSubnet": {
+			"Type": "AWS::EC2::Subnet",
+			"Properties": {
+				"VpcId": {
+					"Ref":"VPC"
+				},
+				"CidrBlock": {
+					"Ref":"PublicSubnetCIDR"
+				},
+				"MapPublicIpOnLaunch":true,
+				"AvailabiltyZone":{
+					"Ref":"AZ"
+				},
+				"Tags":[{
+					"Key":"Name",
+					"Value":"PublicSubnet"
+				},
+				{
+					"Key": "CloudFormationStack",
+					"Value": {
+						"Ref": "AWS::StackId"
+					}
+				}]
+			}
+		},
+		"PrivateSubnet": {
+			"Type": "AWS::EC2::Subnet",
+			"Properties": {
+				"VpcId": {
+					"Ref": "VPC"
+				},
+				"CidrBlock": {
+					"Ref": "PrivateSubnetCIDR"
+				},
+				"MapPublicIpOnLaunch":true,
+				"AvailabiltyZone":{
+					"Ref":"AZ"
+				}
+				"Tags": [{
+					"Key": "Name",
+					"Value":"PrivateSubnet"
+				},
+				{
+					"Key": "CloudFormationStack",
+					"Value": {
+						"Ref": "AWS::StackId"
+					}
+				}]
+			}
+		},
+		"PrivateSubnet2": {
+			"Type": "AWS::EC2::Subnet",
+			"Properties": {
+				"VpcId": {
+					"Ref": "VPC"
+				},
+				"CidrBlock": {
+					"Ref": "PrivateSubnetCIDR2"
+				},
+				"MapPublicIpOnLaunch":true,
+				"AvailabiltyZone":{
+					"Ref":"AZ2"
+				}
+				"Tags": [{
+					"Key": "Name",
+					"Value":"PrivateSubnet2"
+				},
+				{
+					"Key": "CloudFormationStack",
+					"Value": {
+						"Ref": "AWS::StackId"
+					}
+				}]
+			}
+		},
+		"AttachGateway": {
+			"Type": "AWS::EC2::VPCGatewayAttachment",
+			"Properties": {
+				"VpcId": {
+					"Ref": "VPC"
+				},
+				"InternetGatewayId": {
+					"Ref": "InternetGateway"
+				}
+			}
+		},
+		"PublicSubnetRouteTable": {
+			"Type": "AWS::EC2::RouteTable",
+			"Properties": {
+				"VpcId": {
+					"Ref": "VPC"
+				},
+				"Tags": [{
+					"Key": "Name",
+					"Value":"PublicSubnetRoutingTable"
+				},
+				{
+					"Key": "CloudFormationStack",
+					"Value": {
+						"Ref": "AWS::StackId"
+					}
+				}]
+			}
+		},
+		"PrivateSubnetRouteTable": {
+			"Type": "AWS::EC2::RouteTable",
+			"Properties": {
+				"VpcId": {
+					"Ref": "VPC"
+				},
+				"Tags": [{
+					"Key": "Name",
+					"Value":"PrivateSubnetRoutingTable"
+				},
+				{
+					"Key": "CloudFormationStack",
+					"Value": {
+						"Ref": "AWS::StackId"
+					}
+				}]
+			}
+		},
+		"PublicRoute": {
+			"Type": "AWS::EC2::Route",
+			"DependsOn": "AttachGateway",
+			"Properties": {
+				"RouteTableId": {
+					"Ref": "PublicSubnetRouteTable"
+				},
+				"DestinationCidrBlock": "0.0.0.0/0",
+				"GatewayId": {
+					"Ref": "InternetGateway"
+				}
+			}
+		},
+		"PrivateRoute": {
+			"Type": "AWS::EC2::Route",
+			"DependsOn": "AttachGateway",
+			"Properties": {
+				"RouteTableId": {
+					"Ref": "PrivateSubnetRouteTable"
+				},
+				"DestinationCidrBlock": "0.0.0.0/0",
+				"GatewayId": {
+					"Ref": "InternetGateway"
+				}
+			}
+		},
+		"PublicSubnetRouteTableAssociation": {
+			"Type": "AWS::EC2::SubnetRouteTableAssociation",
+			"Properties": {
+				"SubnetId": {
+					"Ref": "PublicSubnet"
+				},
+				"RouteTableId": {
+					"Ref": "PublicSubnetRouteTable"
+				}
+			}
+		},
+		"PrivatecSubnetRouteTableAssociation": {
+			"Type": "AWS::EC2::SubnetRouteTableAssociation",
+			"Properties": {
+				"SubnetId": {
+					"Ref": "PrivateSubnet"
+				},
+				"RouteTableId": {
+					"Ref": "PrivateSubnetRouteTable"
+				}
+			}
+		},
+		"PrivatecSubnetRouteTableAssociation2": {
+			"Type": "AWS::EC2::SubnetRouteTableAssociation",
+			"Properties": {
+				"SubnetId": {
+					"Ref": "PrivateSubnet2"
+				},
+				"RouteTableId": {
+					"Ref": "PrivateSubnetRouteTable"
+				}
+			}
+		},
+		"PublicInstanceSG": {
+			"Type": "AWS::EC2::SecurityGroup",
+			"Properties": {
+				"VpcId": {
+					"Ref": "VPC"
+				},
+				"GroupDescription": "Enable HTTP from Load balancer",
+				"SecurityGroupIngress": [
+					{
+					"IpProtocol": "tcp",
+					"FromPort": "80",
+					"ToPort": "80",
+					"CidrIp": "PublicSubnetCDIR"
+					}
+					{
+					"IpProtocol": "tcp",
+					"FromPort": "80",
+					"ToPort": "80",
+					"CidrIp": "PublicSubnetCDIR"
+					}
+				],
+				"Tags": [{
+					"Key": "Name",
+					"Value":"EC2-SecurityGroup"
+				},
+				{
+					"Key": "CloudFormationStack",
+					"Value": {
+						"Ref": "AWS::StackId"
+					}
+				}]
+			}
+		},
+		"PrivateInstanceSG": {
+			"Type": "AWS::EC2::SecurityGroup",
+			"Properties": {
+				"VpcId": {
+					"Ref": "VPC"
+				},
+				"GroupDescription": "Enable HTTP from Load balancer",
+				"SecurityGroupIngress": [
+				{
+					"IpProtocol": "tcp",
+					"FromPort": "80",
+					"ToPort": "80",
+					"CidrIp": "PublicSubnetCDIR"
+				}
+				{
+					"IpProtocol": "tcp",
+					"FromPort": "80",
+					"ToPort": "80",
+					"CidrIp": "PublicSubnetCDIR"
+				}],
+				"Tags": [{
+					"Key": "Name",
+					"Value":"EC2-SecurityGroup"
+				},
+				{
+					"Key": "CloudFormationStack",
+					"Value": {
+						"Ref": "AWS::StackId"
+					}
+				}]
+			}
+		},
+		"myTargetGroup":{
+			"Type":"AWS::ElasticloadBalancingV2::TargetGroup",
+			"Properties":{
+				"HealthCheckEnabled":true,
+				"HealthCheckIntervalSeconds":30,
+				"HealthCheckPath":"/index.html",
+				"HealthCheckPort":80,
+				"HealthCheckProtocol":"HTTP",
+				"HealthCheckTimeoutSeconds":10,
+				"HealthThreshouldCount":3,
+				"Name":"WebServers",
+				"Port":80,
+				"Protocal":"HTTP",
+				"TargetType":"instance",
+				"UnhealthyThreshouldCount":3,
+				"VpcId":{
+					"Ref":"VPC"
+				}
+			}
+		},
+		"myLoadBalancer":{
+			"Type":"AWS::ElasticloadBalancingV2::LoadBalancer",
+				"Properties":{
+					"Name":"myalb1",
+					"SecurityGroups":[
+					{
+						"Ref":"PublicInstanceSG"
+					}
+					],
+				"Subnets":[
+				{
+					"Ref":"PrivateSubnet"
+				},
+				{
+					"Ref":"PrivateSubnet2"
+				}
+				]
+				},
+		},
+			"HTTPlistener":{
+				"Type":"AWS::ElasticloadBalancingV2::Listener",
+				"Properties":{
+					"DefaultActions":[
+					{
+					"TargetGroupArn":{
+						"Ref":"myTargetGroup"
+					},
+						"Type":"forword"
+					}
+					],
+					"LoadBalancerArn":{
+						"Ref":"myLoadBalancer"
+					},
+					"Port"80,
+					"Protocol":"HTTP"
+					}
+		},
+		"myLaunchConfig":{
+			"Type":"AWS::Autoscaling::LaunchConfiguration",
+				"Properties":{
+					"KeyName":"xxxx",
+					"ImageId":"xxxx",
+						"UserData":{
+							"Fn::Base64":{
+								"Fn::Join":[
+									"\n",
+								[
+								"#!/bin/bash",
+								"yum update -y",
+								"yum install neginx -y",
+								"rm -rf /usr/share/nginx/html/index.html",
+								"yum install git -y",
+								"git clone https://github.com/mavrick202/webhooktesting.git",
+								"cd webhooktesting",
+								"cp index.html /usr/share.nginx/html",
+								"cp style.css /usr/share/neginx/html",
+								"cp scorekeeper.js /usr/share/nginx/html",
+								"service nginx start"
+								]
+								]
+							}
+							
+						},
+					"SecurityGroups":[
+						{
+							"Ref":"PublicInstanceSG"
+						}
+					],
+						"InstanceType":"t2.micro"
+				}
+		},
+		"WebServerGroup":{
+			"Type":"AWS::AutoScaling::AutoScalingGroup",
+				"Properties":{
+					"AvailabiltyZone":[
+					{
+						"Ref":"AZ"
+					}
+					],
+						"VPCZoneIdentifer":[
+						{
+							"Ref":"PrivateSubnet"
+						}
+						],
+							"LaunchConfigurationName":{
+								"Ref":"myLaunchConfig"
+							},
+								"TargetGroupARNs":[
+								{
+									"Ref":"myTargetGroup"
+								}
+								],
+							"MinSize":"1",
+							"MaxSize":"1"
+				},
+			"UpdatePolicy":{
+				"AutoScalingRollingUpdate":{
+					"MinInstancesInService":"1",
+					"MaxBatchSize":"1",
+					"PauseTime":"PT15M",
+					"WaitOnResourceSignals":"true"
+									
+				}
+			}
+		}
+		"Outputs":{
+			"VPCId":{
+				"Desciptions":"VPCId of the newly created VPC",
+				"Value":{
+					"Ref":"VOC"
+				}
+				},
+				"PublicSubnet":{
+				"Description":"SubnetId of the public subnet",
+				"Value":{
+				"Ref": "PublicSubnet"
+				}
+				},
+				"PublicSubnetRouteTable":{
+				"Description":"SubnetId of the public table",
+				"Value":{
+				"Ref": "PublicSubnetRouteTable"
+				}
+				},
+				"PublicInstanceSG":{
+					"Description":"SG for instances in public subnet ",
+					"Value":{
+					"Ref":"PublicInstanceSG"
+					}
+				}
+			}
+		
+	}
+}	
+		

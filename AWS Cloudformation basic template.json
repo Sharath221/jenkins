@@ -28,14 +28,14 @@
 		"VPCCIDR": {
 			"AllowedPattern": "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$",
 			"ConstraintDescription": "CIDR block parameter must be in the form x.x.x.x/16-28",
-			"Default": "10.10.0.0/16",
+			"Default": "10.1.0.0/16",
 			"Description": "CIDR block for entire VPC.",
 			"Type": "String"
 		},
 		"PublicSubnetCIDR": {
 			"AllowedPattern": "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$",
 			"ConstraintDescription": "CIDR block parameter must be in the form x.x.x.x/16-28",
-			"Default": "10.10.10.0/24",
+			"Default": "10.1.1.0/24",
 			"Description": "CIDR block for the public subnet",
 			"Type": "String"
 		},
@@ -61,7 +61,7 @@
 				},
 				"Tags": [{
 					"Key": "Name",
-					"Value": "SUNDEEP"
+					"Value": "CF-VPC"
 				},
 				{
 					"Key": "CloudFormationStack",
@@ -76,7 +76,7 @@
 			"Properties": {
 				"Tags": [{
 					"Key": "Name",
-					"Value": "IGW"
+					"Value": "CF-IGW"
 				},
 				{
 					"Key": "CloudFormationStack",
@@ -214,9 +214,9 @@
         "WebServer": {
           "Type": "AWS::EC2::Instance",  
           "Properties": {
-          "ImageId"            : "ami-0080e4c5bc078760e",
+          "ImageId"            : "ami-035b3c7efe6d061d5",
           "InstanceType"       : "t2.micro",
-          "KeyName"            : "LaptopKey",
+          "KeyName"            : "New Offclapkey",
           "NetworkInterfaces" : [{
           "AssociatePublicIpAddress" : "true",
           "DeviceIndex"              : "0",
